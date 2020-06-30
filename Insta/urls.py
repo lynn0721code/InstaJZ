@@ -16,8 +16,14 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import include, path
 
-from Insta.views import HelloWorld
+from Insta.views import HelloWorld, PostsView, PostDetailView, PostCreateView, PostUpdateView, PostDeleteView 
 
 urlpatterns = [
-    path('', HelloWorld.as_view(), name='helloWorld') #当输入是空的时候返回hello world
+    path('', HelloWorld.as_view(), name='helloWorld'), #当输入是空的时候返回hello world
+    path('posts/', PostsView.as_view(), name = 'posts'),#当传递进来的路径是posts的时候，我们会用PostsView.as_view()这个函数
+    path('post/<int:pk>', PostDetailView.as_view(), name = 'post_detail'), #a key will be provided with the post and use it as primary key to render it.
+    path('post/new/', PostCreateView.as_view(), name = 'make_post'),
+    path('post/update/<int:pk>', PostUpdateView.as_view(), name = 'post_update'),
+    path('post/delete/<int:pk>', PostDeleteView.as_view(), name = 'post_delete'),
+
 ]
