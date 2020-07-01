@@ -16,7 +16,14 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import include, path
 
+from Insta.views import SignUp
+
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('insta/', include('Insta.urls'))
+    path('insta/', include('Insta.urls')),
+    path('auth/', include('django.contrib.auth.urls')),
+    path('auth/signup/', SignUp.as_view(), name = 'signup'),
+    #对这个全局的urls的理解可以如下：
+    #当输入的url是insta开头的话就交给insta这个app下面的urls.py来进行操作。
+    #当输入的url是auth开头的话就交给django.contrib.auth这个app的urls来处理，而这个app是Django自身带有的。
 ]

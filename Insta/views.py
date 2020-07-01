@@ -6,6 +6,10 @@ from Insta.models import Post
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.urls import reverse_lazy 
 
+from django.contrib.auth.mixins import LoginRequiredMixin
+
+from Insta.forms import CustomUserCreationForm
+
 #HelloWorld is a TemplateView
 
 class HelloWorld(TemplateView): #不用import template，因为已经在settings.py中已经定义
@@ -19,10 +23,14 @@ class PostDetailView(DetailView):
     model = Post 
     template_name = 'post_detail.html' 
 
-class PostCreateView(CreateView):
-    model = Post
+#CreateView, UpdateView 和 DeleteView都是基于form 来完成的
+#PostCreateView 就是处理Post里面所有的field, PostUpdateView处理的就是Post里面所有的title
+#PostDeleteView 就是针对整个表格。
+class PostCreateView(LoginRequiredMixin, CreateView): #只有log in 过后才能create, 因为
+    model = Post                                      #加入了 LoginRequiredMixin
     template_name = 'post_create.html'
     fields = '__all__'
+    login_url = 'login'
 
 class PostUpdateView(UpdateView):
     model = Post
@@ -33,3 +41,8 @@ class PostDeleteView(DeleteView):
     model = Post 
     template_name = 'post_delete.html'
     success_url = reverse_lazy("posts")
+
+class SignUp(CreateView):
+    form_class = CustomUserCreationForm
+    template_name = 'signup.html' #通过这个url来访问
+    success_url = reverse_lazy("login") #signup成功过后跳转到什么页面
