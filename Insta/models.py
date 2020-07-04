@@ -13,6 +13,32 @@ class InstaUser(AbstractUser): #在继承Django中自带的AbstractUser后再自
         null = True,
     )
 
+    def get_connections(self):
+        connections = UserConnection.objects.filter(creator=self)
+        return connections
+
+    def get_followers(self):
+        followers = UserConnection.objects.filter(following=self)
+        return followers
+
+    def is_followed_by(self, user):
+        followers = UserConnection.objects.filter(following=self)
+        return followers.filter(creator=user).exists()
+
+class UserConnection(models.Model):
+    created = models.DateTimeField(auto_now_add=True, editable=False)
+    creator = models.ForeignKey(
+        InstaUser,
+        on_delete=models.CASCADE,
+        related_name="friendship_creator_set")
+    following = models.ForeignKey(
+        InstaUser,
+        on_delete=models.CASCADE,
+        related_name="friend_set")
+
+    def __str__(self):
+        return self.creator.username + ' follows ' + self.following.username
+
 class Post(models.Model): 
     author = models.ForeignKey( #Post也应该是一个foreign key，因为其应是指向某一个发这个post的用户
         InstaUser,
@@ -29,7 +55,7 @@ class Post(models.Model):
     )
     def get_like_count(self):
         return self.likes.count()
-        
+
     #if someone create a post, it will redirect to get_absolute_url
     def get_absolute_url(self):
         return reverse("post_detail", args = [str(self.id)])
