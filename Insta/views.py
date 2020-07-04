@@ -32,9 +32,17 @@ class PostDetailView(DetailView):
     model = Post 
     template_name = 'post_detail.html' 
 
-class UserDetailView(DetailView):
+class UserDetailView(LoginRequiredMixin, DetailView):
     model = InstaUser
-    template_name = 'user_detail.html' 
+    template_name = 'user_detail.html'
+    login_url = 'login' 
+
+
+class EditProfile(LoginRequiredMixin, UpdateView):
+    model = InstaUser
+    template_name = 'edit_profile.html'
+    fields = ['profile_pic', 'username']
+    login_url = 'login'
 
 #CreateView, UpdateView 和 DeleteView都是基于form 来完成的
 #PostCreateView 就是处理Post里面所有的field, PostUpdateView处理的就是Post里面所有的title

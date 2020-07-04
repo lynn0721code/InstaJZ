@@ -25,6 +25,12 @@ class InstaUser(AbstractUser): #在继承Django中自带的AbstractUser后再自
         followers = UserConnection.objects.filter(following=self)
         return followers.filter(creator=user).exists()
 
+    def get_absolute_url(self):
+        return reverse('user_detail', args = [str(self.id)])
+
+    def __str__(self):
+        return self.username
+
 class UserConnection(models.Model):
     created = models.DateTimeField(auto_now_add=True, editable=False)
     creator = models.ForeignKey(
