@@ -18,7 +18,7 @@ from django.urls import include, path
 
 from Insta.views import (HelloWorld, PostsView, PostDetailView, 
                         addLike, PostCreateView, PostUpdateView, PostDeleteView,
-                        UserDetailView, EditProfile, toggleFollow) 
+                        UserDetailView, EditProfile, toggleFollow, addComment) 
 
 urlpatterns = [
     path('helloworld/', HelloWorld.as_view(), name='helloWorld'), #当输入是空的时候返回hello world
@@ -30,6 +30,7 @@ urlpatterns = [
     path('like', addLike, name='addLike'),
     path('user/<int:pk>', UserDetailView.as_view(), name = 'user_detail'),
     path('edit_profile/<int:pk>/', EditProfile.as_view(), name = 'edit_profile'),
-    path('togglefollow', toggleFollow, name = 'togglefollow')
+    path('togglefollow', toggleFollow, name = 'togglefollow'),
+    path('comment', addComment, name='addComment'),
 
 ]

@@ -3,7 +3,7 @@ from django.shortcuts import render
 
 # Create your views here.
 from django.views.generic import TemplateView, ListView, DetailView
-from Insta.models import Post, Like, InstaUser, UserConnection
+from Insta.models import Post, Like, InstaUser, UserConnection, Comment
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.urls import reverse_lazy 
 
@@ -16,12 +16,14 @@ from Insta.forms import CustomUserCreationForm
 class HelloWorld(TemplateView): #不用import template，因为已经在settings.py中已经定义
     template_name = 'test.html'
 
-class PostsView(LoginRequiredMixin, ListView): #ListView 会将所有的posts生成为一个lists传递给index.html,用于里面的for loop显示
+class PostsView(ListView): #ListView 会将所有的posts生成为一个lists传递给index.html,用于里面的for loop显示
     model = Post 
     template_name = 'index.html'
-    login_url = "login"
-
+    #login_url = "login"
     def get_queryset(self):
+        if not self.request.user.is_authenticated:
+            return
+
         current_user = self.request.user
         following = set()
         for conn in UserConnection.objects.filter(creator=current_user).select_related('following'):
@@ -51,7 +53,10 @@ class PostCreateView(LoginRequiredMixin, CreateView): #只有log in 过后才能
     model = Post                                      #加入了 LoginRequiredMixin
     template_name = 'post_create.html'
     fields = '__all__'
-    login_url = 'login'
+
+    def form_valid(self, form):
+        form.instance.author = self.request.user
+        return super().form_valid(form)
 
 class PostUpdateView(UpdateView):
     model = Post
@@ -93,7 +98,7 @@ def toggleFollow(request):
         'type': request.POST.get('type'),
         'follow_user_pk': follow_user_pk
     }
-    
+
 
 @ajax_request
 def addLike(request):
@@ -111,4 +116,34 @@ def addLike(request):
     return {
         'result': result,
         'post_pk': post_pk
+    }
+
+
+@ajax_request
+def addComment(request):
+    comment_text = request.POST.get('comment_text')
+    post_pk = request.POST.get('post_pk')
+    post = Post.objects.get(pk=post_pk)
+    commenter_info = {}
+
+    try:
+        comment = Comment(comment=comment_text, user=request.user, post=post)
+        comment.save()
+
+        username = request.user.username
+
+        commenter_info = {
+            'username': username,
+            'comment_text': comment_text
+        }
+
+        result = 1
+    except Exception as e:
+        print(e)
+        result = 0
+
+    return {
+        'result': result,
+        'post_pk': post_pk,
+        'commenter_info': commenter_info
     }
