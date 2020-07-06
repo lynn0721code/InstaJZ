@@ -52,7 +52,7 @@ class EditProfile(LoginRequiredMixin, UpdateView):
 class PostCreateView(LoginRequiredMixin, CreateView): #只有log in 过后才能create, 因为
     model = Post                                      #加入了 LoginRequiredMixin
     template_name = 'post_create.html'
-    fields = '__all__'
+    fields = {'title', 'image'}
 
     def form_valid(self, form):
         form.instance.author = self.request.user
