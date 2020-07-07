@@ -34,6 +34,14 @@ class PostDetailView(DetailView):
     model = Post 
     template_name = 'post_detail.html' 
 
+class ExploreView(LoginRequiredMixin, ListView):
+    model = Post
+    template_name = 'explore.html'
+    login_url = 'login'
+
+    def get_queryset(self):
+        return Post.objects.all().order_by('-posted_on')[:20]
+
 class UserDetailView(LoginRequiredMixin, DetailView):
     model = InstaUser
     template_name = 'user_detail.html'
